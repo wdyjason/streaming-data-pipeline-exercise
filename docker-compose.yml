@@ -1,0 +1,15 @@
+version: '3'
+services: 
+    # https://ci.apache.org/projects/flink/flink-docs-master/docs/deployment/resource-providers/standalone/docker/
+    jobmanager:
+        image: flink:scala_2.12-java11
+        ports: 
+            - 8081:8081
+        environment: 
+            FLINK_PROPERTIES: "jobmanager.rpc.address: jobmanager"
+        command: jobmanager
+    taskmanager:
+        image: flink:scala_2.12-java11
+        environment: 
+            FLINK_PROPERTIES: "jobmanager.rpc.address: jobmanager"
+        command: taskmanager
