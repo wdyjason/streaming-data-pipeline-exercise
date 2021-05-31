@@ -8,13 +8,12 @@ services:
         environment: 
             FLINK_PROPERTIES: "jobmanager.rpc.address: jobmanager"
         command: jobmanager
+
     taskmanager:
         image: flink:scala_2.12-java11
         environment: 
             FLINK_PROPERTIES: "jobmanager.rpc.address: jobmanager"
         command: taskmanager
-        volumes:
-        -   conf/flink/log4j-console.properties:/opt/flink/log4j-console.properties
 
     kafka:
         image: confluentinc/cp-kafka:5.4.4

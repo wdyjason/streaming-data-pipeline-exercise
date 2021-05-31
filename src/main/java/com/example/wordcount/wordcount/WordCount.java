@@ -11,7 +11,7 @@ public class WordCount {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<String> dataStreamSource = env
                 .socketTextStream("localhost", 9999);
-        DataStream<Tuple2<String, Integer>> dataStream = new WordCountProcessor(dataStreamSource).perform();
+        DataStream<Tuple2<String, Integer>> dataStream = new WordCountTransformer(dataStreamSource).perform();
         dataStream.print();
         env.execute("WordCount");
     }

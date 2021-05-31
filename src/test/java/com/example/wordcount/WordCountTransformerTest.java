@@ -1,8 +1,8 @@
 package com.example.wordcount;
 
-import com.example.wordcount.wordcount.WordCountProcessor;
+import com.example.support.TestHelper;
+import com.example.wordcount.wordcount.WordCountTransformer;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -17,14 +17,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class WordCountProcessorTest {
+public class WordCountTransformerTest {
     @ClassRule
-    public static MiniClusterWithClientResource flinkCluster =
-            new MiniClusterWithClientResource(
-                    new MiniClusterResourceConfiguration.Builder()
-                            .setNumberSlotsPerTaskManager(2)
-                            .setNumberTaskManagers(1)
-                            .build());
+    public static MiniClusterWithClientResource flinkCluster = TestHelper.getMiniClusterWithClientResource();
 
     @Test
     void should_count_words() throws Exception {
@@ -36,7 +31,7 @@ public class WordCountProcessorTest {
                 "Hello tomorrow"
         );
 
-        DataStream<Tuple2<String, Integer>> dataStream = new WordCountProcessor(dataStreamSource).perform();
+        DataStream<Tuple2<String, Integer>> dataStream = new WordCountTransformer(dataStreamSource).perform();
 
         dataStream.addSink(new CollectSink());
 
