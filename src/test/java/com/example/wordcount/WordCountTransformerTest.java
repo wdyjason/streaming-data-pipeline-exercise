@@ -1,7 +1,6 @@
 package com.example.wordcount;
 
 import com.example.support.TestHelper;
-import com.example.wordcount.wordcount.WordCountTransformer;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
