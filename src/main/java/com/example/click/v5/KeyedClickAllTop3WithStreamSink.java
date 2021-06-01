@@ -34,7 +34,7 @@ import java.util.Properties;
  * 101:1
  */
 
-public class KeyedClickAllTop3 {
+public class KeyedClickAllTop3WithStreamSink {
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
         String kafkaBoostrapServers = "localhost:9092";
