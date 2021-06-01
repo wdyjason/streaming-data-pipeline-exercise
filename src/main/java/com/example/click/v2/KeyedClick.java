@@ -9,6 +9,10 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Properties;
 
 
@@ -38,12 +42,15 @@ public class KeyedClick {
 
         SingleOutputStreamOperator<Click> sum = new KeyedClickTransformer(stream).perform();
 
+        sum.print();
+
         /**
          * Create the table first in postgresql
          *
          * CREATE TABLE keyed_clicks (
          *     itemId VARCHAR PRIMARY KEY,
-         *     "count" BIGINT
+         *     "count" BIGINT,
+         *     "timestamp" timestamp
          * )
          */
         sum.addSink(buildDatabaseSink(
@@ -56,14 +63,17 @@ public class KeyedClick {
 
     private static SinkFunction<Click> buildDatabaseSink(String jdbcURL, String username, String password) {
         return JdbcSink.sink(
-                "INSERT INTO keyed_clicks (itemId, \"count\") values (?, ?)\n" +
+                "INSERT INTO keyed_clicks (itemId, \"count\", \"timestamp\") values (?, ?, ?)\n" +
                         "ON conflict(itemId) DO\n" +
                         "UPDATE\n" +
-                        "SET \"count\" = ?",
+                        "SET \"count\" = ?, \"timestamp\" = ?",
                 (preparedStatement, click) -> {
                     preparedStatement.setString(1, click.getItemId());
                     preparedStatement.setLong(2, click.getCount());
-                    preparedStatement.setLong(3, click.getCount());
+                    Timestamp timestamp = Timestamp.from(Instant.ofEpochMilli(click.getTimestamp()));
+                    preparedStatement.setTimestamp(3, timestamp);
+                    preparedStatement.setLong(4, click.getCount());
+                    preparedStatement.setTimestamp(5, timestamp);
                 },
                 JdbcExecutionOptions.builder()
                         .withBatchSize(1000)
