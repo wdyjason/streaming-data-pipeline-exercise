@@ -14,6 +14,7 @@ ext {
     scalaBinaryVersion = '2.12'
     slf4jVersion = '1.7.15'
     log4jVersion = '2.12.1'
+    postgresJDBCVersion = '42.2.20'
 }
 
 repositories {
@@ -28,6 +29,15 @@ dependencies {
 
     // for Kafka connector
     compile "org.apache.flink:flink-connector-kafka_${scalaBinaryVersion}:${flinkVersion}"
+
+    // for jdbc
+    compile "org.apache.flink:flink-connector-jdbc_${scalaBinaryVersion}:${flinkVersion}"
+    compile "org.postgresql:postgresql:${postgresJDBCVersion}"
+
+    // for table api
+    compile "org.apache.flink:flink-table-api-java-bridge_${scalaBinaryVersion}:${flinkVersion}"
+    compile "org.apache.flink:flink-table-planner-blink_${scalaBinaryVersion}:${flinkVersion}"
+    compile "org.apache.flink:flink-streaming-scala_${scalaBinaryVersion}:${flinkVersion}"
 
     compile "org.apache.logging.log4j:log4j-api:${log4jVersion}"
     compile "org.apache.logging.log4j:log4j-core:${log4jVersion}"
@@ -54,6 +64,8 @@ shadowJar {
     dependencies {
         exclude(dependency("org.apache.flink:flink-streaming-java_*"))
         exclude(dependency("org.apache.flink:flink-clients_*"))
+        exclude(dependency("org.apache.flink:flink-table-*"))
+        exclude(dependency("org.apache.flink:flink-streaming-scala_*"))
         exclude(dependency("org.slf4j:.*"))
         exclude(dependency("org.apache.logging.log4j:.*"))
     }

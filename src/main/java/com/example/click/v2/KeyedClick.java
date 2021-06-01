@@ -1,9 +1,12 @@
 package com.example.click.v2;
 
 import com.example.click.Click;
-import com.example.click.RawClick;
+import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
+import org.apache.flink.connector.jdbc.JdbcExecutionOptions;
+import org.apache.flink.connector.jdbc.JdbcSink;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 
 import java.util.Properties;
@@ -35,9 +38,45 @@ public class KeyedClick {
 
         SingleOutputStreamOperator<Click> sum = new KeyedClickTransformer(stream).perform();
 
-        sum.print();
+        /**
+         * Create the table first in postgresql
+         *
+         * CREATE TABLE keyed_clicks (
+         *     itemId VARCHAR PRIMARY KEY,
+         *     "count" BIGINT
+         * )
+         */
+        sum.addSink(buildDatabaseSink(
+                "jdbc:postgresql://localhost:5432/database",
+                "postgres",
+                "postgres"));
 
         env.execute(("KeyedClick processing"));
+    }
+
+    private static SinkFunction<Click> buildDatabaseSink(String jdbcURL, String username, String password) {
+        return JdbcSink.sink(
+                "INSERT INTO keyed_clicks (itemId, \"count\") values (?, ?)\n" +
+                        "ON conflict(itemId) DO\n" +
+                        "UPDATE\n" +
+                        "SET \"count\" = ?",
+                (preparedStatement, click) -> {
+                    preparedStatement.setString(1, click.getItemId());
+                    preparedStatement.setLong(2, click.getCount());
+                    preparedStatement.setLong(3, click.getCount());
+                },
+                JdbcExecutionOptions.builder()
+                        .withBatchSize(1000)
+                        .withBatchIntervalMs(200)
+                        .withMaxRetries(5)
+                        .build(),
+                new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
+                        .withUrl(jdbcURL)
+                        .withDriverName("org.postgresql.Driver")
+                        .withUsername(username)
+                        .withPassword(password)
+                        .build()
+        );
     }
 
 }

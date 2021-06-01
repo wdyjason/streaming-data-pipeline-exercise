@@ -37,3 +37,18 @@ services:
 
     schema-registry:
         image: confluentinc/cp-schema-registry:5.4.4
+
+    database:
+        image: postgres:13
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: database
+        volumes:
+            - ./data/database:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD", "pg_isready", "-U", "postgres"]
+            interval: 5s
+            retries: 5
+        ports:
+        -   5432:5432
