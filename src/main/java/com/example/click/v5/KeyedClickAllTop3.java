@@ -1,26 +1,27 @@
-package com.example.click.v2;
+package com.example.click.v5;
 
-import com.example.click.shared.Click;
+import com.example.click.shared.KeyedClickByTableTransformer;
+import com.example.click.shared.KeyedClickDeserializationSchema;
+import com.example.click.shared.WindowClickRecord;
 import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
 import org.apache.flink.connector.jdbc.JdbcExecutionOptions;
 import org.apache.flink.connector.jdbc.JdbcSink;
-import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Properties;
 
 
 /**
  * Create the table first in postgresql
  *
- * CREATE TABLE keyed_click (
- *     itemId VARCHAR PRIMARY KEY,
+ * CREATE TABLE keyed_click_v5 (
+ *     itemId VARCHAR,
  *     "count" BIGINT,
- *     "timestamp" timestamp
+ *     startTime timestamp,
+ *     endTime timestamp,
+ *     PRIMARY KEY(itemId, startTime)
  * )
  *
  * Produce message with
@@ -33,43 +34,45 @@ import java.util.Properties;
  * 101:1
  */
 
-public class KeyedClick {
+public class KeyedClickAllTop3 {
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        properties.setProperty("bootstrap.servers", "localhost:9092");
-        properties.setProperty("group.id", "KeyedClick");
+        String kafkaBoostrapServers = "localhost:9092";
+        properties.setProperty("bootstrap.servers", kafkaBoostrapServers);
+        String groupId = "KeyedClickTop3";
+        properties.setProperty("group.id", groupId);
+        String kafkaTopic = "keyed_click";
+
         var env = StreamExecutionEnvironment.getExecutionEnvironment();
         var schema = new KeyedClickDeserializationSchema();
-        String kafkaTopic = "keyed_click";
         var stream = env
                 .addSource(new FlinkKafkaConsumer<>(kafkaTopic, schema, properties));
 
-        SingleOutputStreamOperator<Click> sum = new KeyedClickTransformer(stream).perform();
+        var windowedClickStream = new KeyedClickByTableTransformer(stream).perform();
 
-        sum.print();
-
-        sum.addSink(buildDatabaseSink(
+        windowedClickStream.addSink(buildDatabaseSink(
                 "jdbc:postgresql://localhost:5432/database",
                 "postgres",
                 "postgres"));
 
-        env.execute(("KeyedClick processing"));
+        env.execute("Click v3 processing");
     }
 
-    private static SinkFunction<Click> buildDatabaseSink(String jdbcURL, String username, String password) {
-        String dbTableName = "keyed_click";
+    private static SinkFunction<WindowClickRecord> buildDatabaseSink(String jdbcURL, String username, String password) {
+        String dbTableName = "keyed_click_v5";
         return JdbcSink.sink(
-                "INSERT INTO " + dbTableName + " (itemId, \"count\", \"timestamp\") values (?, ?, ?)\n" +
-                        "ON conflict(itemId) DO\n" +
+                "INSERT INTO " + dbTableName + " (itemId, \"count\", startTime, endTime) values (?, ?, ?, ?)\n" +
+                        "ON conflict(itemId, startTime) DO\n" +
                         "UPDATE\n" +
-                        "SET \"count\" = ?, \"timestamp\" = ?",
+                        "SET \"count\" = ?, endTime = ?",
                 (preparedStatement, click) -> {
                     preparedStatement.setString(1, click.getItemId());
                     preparedStatement.setLong(2, click.getCount());
-                    Timestamp timestamp = Timestamp.from(Instant.ofEpochMilli(click.getTimestamp()));
-                    preparedStatement.setTimestamp(3, timestamp);
-                    preparedStatement.setLong(4, click.getCount());
-                    preparedStatement.setTimestamp(5, timestamp);
+                    preparedStatement.setTimestamp(3, click.getStartTime());
+                    preparedStatement.setTimestamp(4, click.getEndTime());
+
+                    preparedStatement.setLong(5, click.getCount());
+                    preparedStatement.setTimestamp(6, click.getEndTime());
                 },
                 JdbcExecutionOptions.builder()
                         .withBatchSize(1000)

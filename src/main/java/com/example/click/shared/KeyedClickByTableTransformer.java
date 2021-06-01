@@ -1,4 +1,4 @@
-package com.example.click.v4;
+package com.example.click.shared;
 
 import com.example.click.shared.RawClick;
 import com.example.click.shared.WindowClickRecord;

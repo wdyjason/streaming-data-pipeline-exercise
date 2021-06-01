@@ -1,6 +1,7 @@
 package com.example.click.v4;
 
 import com.example.click.shared.ClickRecord;
+import com.example.click.shared.KeyedClickByTableTransformer;
 import com.example.click.shared.KeyedClickDeserializationSchema;
 import com.example.click.shared.WindowClickRecord;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
