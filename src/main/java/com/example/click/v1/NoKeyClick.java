@@ -1,6 +1,6 @@
 package com.example.click.v1;
 
-import com.example.click.Click;
+import com.example.click.RawClick;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -32,11 +32,11 @@ public class NoKeyClick {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStream<String> stream = env
                 .addSource(new FlinkKafkaConsumer<>("no_key_click", new SimpleStringSchema(), properties));
-        SingleOutputStreamOperator<Click> sum = new NoKeyClickTransformer(stream).perform();
+        SingleOutputStreamOperator<RawClick> sum = new NoKeyClickTransformer(stream).perform();
 
         sum.print();
 
-        env.execute(("ProcessingTime processing example"));
+        env.execute(("NoKeyClick processing"));
     }
 
 }

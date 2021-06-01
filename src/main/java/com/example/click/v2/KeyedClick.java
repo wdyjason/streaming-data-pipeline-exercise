@@ -1,6 +1,7 @@
 package com.example.click.v2;
 
 import com.example.click.Click;
+import com.example.click.RawClick;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
@@ -25,7 +26,7 @@ import java.util.Properties;
 public class KeyedClick {
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        properties.setProperty("bootstrap.servers", "kafka:19092");
+        properties.setProperty("bootstrap.servers", "localhost:9092");
         properties.setProperty("group.id", "KeyedClick");
         var env = StreamExecutionEnvironment.getExecutionEnvironment();
         var schema = new KeyedClickDeserializationSchema();
@@ -36,7 +37,7 @@ public class KeyedClick {
 
         sum.print();
 
-        env.execute(("ProcessingTime processing example"));
+        env.execute(("KeyedClick processing"));
     }
 
 }

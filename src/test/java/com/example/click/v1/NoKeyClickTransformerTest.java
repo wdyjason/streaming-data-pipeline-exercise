@@ -1,8 +1,7 @@
-package com.example.click.v2;
+package com.example.click.v1;
 
-import com.example.click.Click;
-import com.example.click.ClickSInkFunction;
-import com.example.click.v1.NoKeyClickTransformer;
+import com.example.click.RawClick;
+import com.example.click.RawClickSInkFunction;
 import com.example.support.TestHelper;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -23,25 +22,25 @@ public class NoKeyClickTransformerTest {
     @Test
     void should_count_click() throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(2);
-        ClickSInkFunction.values.clear();
+        env.setParallelism(1); // try to increase the parallelism
+        RawClickSInkFunction.values.clear();
         DataStreamSource<String> dataStreamSource = env.fromElements(
                 "10001:1",
                 "10001:1",
                 "10002:1"
         );
 
-        SingleOutputStreamOperator<Click> perform = new NoKeyClickTransformer(dataStreamSource).perform();
+        SingleOutputStreamOperator<RawClick> perform = new NoKeyClickTransformer(dataStreamSource).perform();
 
-        perform.addSink(new ClickSInkFunction());
+        perform.addSink(new RawClickSInkFunction());
 
         env.execute();
 
-        List<Click> expectedClicks = List.of(
-                new Click("10001", 1),
-                new Click("10001", 2),
-                new Click("10002", 1)
+        List<RawClick> expectedRawClicks = List.of(
+                new RawClick("10001", 1),
+                new RawClick("10001", 2),
+                new RawClick("10002", 1)
         );
-        assertArrayEquals(expectedClicks.toArray(), ClickSInkFunction.values.toArray());
+        assertArrayEquals(expectedRawClicks.toArray(), RawClickSInkFunction.values.toArray());
     }
 }

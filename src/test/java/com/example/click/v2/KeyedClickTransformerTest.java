@@ -1,8 +1,8 @@
-package com.example.click.v1;
+package com.example.click.v2;
 
 import com.example.click.Click;
 import com.example.click.ClickSInkFunction;
-import com.example.click.v2.KeyedClickTransformer;
+import com.example.click.RawClick;
 import com.example.support.TestHelper;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -11,9 +11,7 @@ import org.apache.flink.test.util.MiniClusterWithClientResource;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class KeyedClickTransformerTest {
     @ClassRule
@@ -23,12 +21,12 @@ public class KeyedClickTransformerTest {
     @Test
     void should_count_click() throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(2);
+        env.setParallelism(1);  // try to increase the parallelism
         ClickSInkFunction.values.clear();
-        DataStreamSource<Click> dataStreamSource = env.fromElements(
-                new Click("10001", 1),
-                new Click("10001", 1),
-                new Click("10002", 1)
+        DataStreamSource<RawClick> dataStreamSource = env.fromElements(
+                new RawClick("10001", 1),
+                new RawClick("10001", 1),
+                new RawClick("10002", 1)
         );
 
         SingleOutputStreamOperator<Click> perform = new KeyedClickTransformer(dataStreamSource).perform();
@@ -37,12 +35,15 @@ public class KeyedClickTransformerTest {
 
         env.execute();
 
-        List<Click> expectedClicks = List.of(
-                new Click("10001", 1),
-                new Click("10001", 2),
-                new Click("10002", 1)
-        );
-        assertArrayEquals(expectedClicks.toArray(), ClickSInkFunction.values.toArray());
+        assertEquals(3, ClickSInkFunction.values.size());
+        assertEquals("10001", ClickSInkFunction.values.get(0).getItemId());
+        assertEquals(1, ClickSInkFunction.values.get(0).getCount());
+
+        assertEquals("10001", ClickSInkFunction.values.get(1).getItemId());
+        assertEquals(2, ClickSInkFunction.values.get(1).getCount());
+
+        assertEquals("10002", ClickSInkFunction.values.get(2).getItemId());
+        assertEquals(1, ClickSInkFunction.values.get(2).getCount());
     }
 
 }
