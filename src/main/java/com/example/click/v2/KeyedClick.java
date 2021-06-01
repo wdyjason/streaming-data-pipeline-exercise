@@ -1,6 +1,6 @@
 package com.example.click.v2;
 
-import com.example.click.Click;
+import com.example.click.shared.Click;
 import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
 import org.apache.flink.connector.jdbc.JdbcExecutionOptions;
 import org.apache.flink.connector.jdbc.JdbcSink;
@@ -11,14 +11,17 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Properties;
 
 
 /**
- * Create the topic first:
- * kafka-topics --create --topic keyed_click --bootstrap-server localhost:9092
+ * Create the table first in postgresql
+ *
+ * CREATE TABLE keyed_click (
+ *     itemId VARCHAR PRIMARY KEY,
+ *     "count" BIGINT,
+ *     "timestamp" timestamp
+ * )
  *
  * Produce message with
  * kafka-console-producer --topic keyed_click --broker-list localhost:9092 --property "parse.key=true" --property "key.separator=:"
@@ -37,22 +40,14 @@ public class KeyedClick {
         properties.setProperty("group.id", "KeyedClick");
         var env = StreamExecutionEnvironment.getExecutionEnvironment();
         var schema = new KeyedClickDeserializationSchema();
+        String kafkaTopic = "keyed_click";
         var stream = env
-                .addSource(new FlinkKafkaConsumer<>("keyed_click", schema, properties));
+                .addSource(new FlinkKafkaConsumer<>(kafkaTopic, schema, properties));
 
         SingleOutputStreamOperator<Click> sum = new KeyedClickTransformer(stream).perform();
 
         sum.print();
 
-        /**
-         * Create the table first in postgresql
-         *
-         * CREATE TABLE keyed_clicks (
-         *     itemId VARCHAR PRIMARY KEY,
-         *     "count" BIGINT,
-         *     "timestamp" timestamp
-         * )
-         */
         sum.addSink(buildDatabaseSink(
                 "jdbc:postgresql://localhost:5432/database",
                 "postgres",
@@ -62,8 +57,9 @@ public class KeyedClick {
     }
 
     private static SinkFunction<Click> buildDatabaseSink(String jdbcURL, String username, String password) {
+        String dbTableName = "keyed_click";
         return JdbcSink.sink(
-                "INSERT INTO keyed_clicks (itemId, \"count\", \"timestamp\") values (?, ?, ?)\n" +
+                "INSERT INTO " + dbTableName + " (itemId, \"count\", \"timestamp\") values (?, ?, ?)\n" +
                         "ON conflict(itemId) DO\n" +
                         "UPDATE\n" +
                         "SET \"count\" = ?, \"timestamp\" = ?",

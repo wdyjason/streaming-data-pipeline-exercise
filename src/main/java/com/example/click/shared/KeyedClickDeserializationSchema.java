@@ -1,6 +1,5 @@
-package com.example.click.v2;
+package com.example.click.shared;
 
-import com.example.click.shared.RawClick;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.connectors.kafka.KafkaDeserializationSchema;
 import org.apache.kafka.clients.consumer.ConsumerRecord;

@@ -1,4 +1,4 @@
-package com.example.click;
+package com.example.click.shared;
 
 import java.util.Objects;
 

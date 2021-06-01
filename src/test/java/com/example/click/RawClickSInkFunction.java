@@ -1,5 +1,6 @@
 package com.example.click;
 
+import com.example.click.shared.RawClick;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 
 import java.util.ArrayList;

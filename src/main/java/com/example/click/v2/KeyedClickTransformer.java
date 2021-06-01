@@ -1,7 +1,7 @@
 package com.example.click.v2;
 
-import com.example.click.Click;
-import com.example.click.RawClick;
+import com.example.click.shared.Click;
+import com.example.click.shared.RawClick;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
