@@ -40,3 +40,7 @@ Kafka中已经包含了创建的商品点击量的数据，现计算每个商品
 ### 第2部分：使用Schema Registry 校验数据编码
 
 TODO
+
+### 第3部分：使用 EventTime 和 Watermark
+
+TODO
