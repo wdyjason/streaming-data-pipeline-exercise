@@ -7,7 +7,7 @@ plugins {
 
 group 'org.example'
 version '1.0-SNAPSHOT'
-mainClassName = 'com.example.click.v1.NoKeyClick'
+mainClassName = 'streamingdatapipelineexercise.examples.click.v1.NoKeyClick'
 
 ext {
     flinkVersion = '1.13.1'
