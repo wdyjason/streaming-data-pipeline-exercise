@@ -1,5 +1,11 @@
 # streaming-data-pipeline-exercise
 
+## 目标
+
+1. 了解 Kafka 的基本用法，理解 Key 的作用
+2. 通过使用 Flink 理解流式管道的应用场景
+3. 通过使用 Schema Registry 理解 Schema 在数据管道中的作用和常见用法
+
 ## 热身任务
 
 本地运行 WordCount 练习，输入数据，观察结果。
