@@ -45,7 +45,37 @@ Kafka中已经包含了创建的商品点击量的数据，现计算每个商品
 
 ### 第2部分：使用Schema Registry 校验数据编码
 
-TODO
+**任务1**
+
+给定schema，在Flink应用中打印反序列化后的数据。
+
+Schema 如下
+
+```json
+{
+      "type": "record",
+      "name": "click",
+      "fields": [
+          {
+              "name": "itemId",
+              "type": "string"
+          },
+          {
+              "name": "count",
+              "type": "long"
+          },
+          {
+              "name": "eventTime",
+              "type" : "long",
+              "logicalType": "timestamp-millis"
+          }
+      ]
+    }
+```
+
+**任务2**
+
+原始数据中新增了字段 userId（类型为long），迁移schema到新的版本，思考对任务1的影响。
 
 ### 第3部分：使用 EventTime 和 Watermark
 
