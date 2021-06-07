@@ -19,6 +19,9 @@ ext {
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://packages.confluent.io/maven/'
+    }
 }
 
 applicationDefaultJvmArgs = ["-Dlog4j.configurationFile=log4j2.properties"]
@@ -33,6 +36,9 @@ dependencies {
     // for jdbc
     compile "org.apache.flink:flink-connector-jdbc_${scalaBinaryVersion}:${flinkVersion}"
     compile "org.postgresql:postgresql:${postgresJDBCVersion}"
+
+    //  for avro confluent schema registry
+    compile "org.apache.flink:flink-avro-confluent-registry:${flinkVersion}"
 
     // for table api
     compile "org.apache.flink:flink-table-api-java-bridge_${scalaBinaryVersion}:${flinkVersion}"
