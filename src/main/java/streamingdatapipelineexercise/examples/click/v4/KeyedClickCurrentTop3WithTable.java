@@ -1,5 +1,6 @@
 package streamingdatapipelineexercise.examples.click.v4;
 
+import streamingdatapipelineexercise.examples.click.shared.Config;
 import streamingdatapipelineexercise.examples.click.shared.KeyedClickByTableTransformer;
 import streamingdatapipelineexercise.examples.click.shared.KeyedClickDeserializationSchema;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -35,7 +36,7 @@ import static org.apache.flink.table.api.Expressions.$;
 public class KeyedClickCurrentTop3WithTable {
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        String kafkaBoostrapServers = "localhost:9092";
+        String kafkaBoostrapServers = Config.KAFKA_BOOTSTRAP_SERVERS;
         properties.setProperty("bootstrap.servers", kafkaBoostrapServers);
         String groupId = "KeyedClickTop3";
         properties.setProperty("group.id", groupId);

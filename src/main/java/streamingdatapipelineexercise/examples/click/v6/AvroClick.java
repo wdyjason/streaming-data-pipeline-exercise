@@ -1,20 +1,12 @@
 package streamingdatapipelineexercise.examples.click.v6;
 
-import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.reflect.AvroSchema;
 import org.apache.avro.util.Utf8;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
-import org.apache.flink.connector.jdbc.JdbcExecutionOptions;
-import org.apache.flink.connector.jdbc.JdbcSink;
-import org.apache.flink.formats.avro.AvroDeserializationSchema;
 import org.apache.flink.formats.avro.registry.confluent.*;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
-import org.apache.flink.streaming.connectors.kafka.KafkaDeserializationSchema;
 import streamingdatapipelineexercise.examples.click.shared.*;
 
 import java.util.Properties;
@@ -27,7 +19,7 @@ import java.util.Properties;
 public class AvroClick {
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        String kafkaBoostrapServers = "localhost:9092";
+        String kafkaBoostrapServers = Config.KAFKA_BOOTSTRAP_SERVERS;
         properties.setProperty("bootstrap.servers", kafkaBoostrapServers);
         String groupId = "AvroClickAllTop3";
         properties.setProperty("group.id", groupId);
@@ -58,7 +50,7 @@ public class AvroClick {
 
         var schema = ConfluentRegistryAvroDeserializationSchema.forGeneric(
                 expectedSchema,
-                "http://localhost:18081"
+                Config.SCHEMA_REGISTRY_SERVER
         );
 
         var stream = env

@@ -8,6 +8,7 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
+import streamingdatapipelineexercise.examples.click.shared.Config;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -36,7 +37,7 @@ import java.util.Properties;
 public class KeyedClickWithStreamSink {
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        properties.setProperty("bootstrap.servers", "localhost:9092");
+        properties.setProperty("bootstrap.servers", Config.KAFKA_BOOTSTRAP_SERVERS);
         properties.setProperty("group.id", "KeyedClick");
         var env = StreamExecutionEnvironment.getExecutionEnvironment();
         var schema = new KeyedClickDeserializationSchema();

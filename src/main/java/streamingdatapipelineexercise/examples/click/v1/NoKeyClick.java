@@ -1,5 +1,6 @@
 package streamingdatapipelineexercise.examples.click.v1;
 
+import streamingdatapipelineexercise.examples.click.shared.Config;
 import streamingdatapipelineexercise.examples.click.shared.RawClick;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -27,7 +28,7 @@ import java.util.Properties;
 public class NoKeyClick {
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
-        properties.setProperty("bootstrap.servers", "kafka:19092");
+        properties.setProperty("bootstrap.servers", Config.KAFKA_BOOTSTRAP_SERVERS);
         properties.setProperty("group.id", "NoKeyClick");
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStream<String> stream = env
