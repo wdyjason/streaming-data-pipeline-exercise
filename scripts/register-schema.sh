@@ -7,6 +7,10 @@ SCHEMA='{
       "name": "click",
       "fields": [
           {
+              "name": "itemId",
+              "type": "string"
+          },
+          {
               "name": "count",
               "type": "long"
           },
@@ -29,7 +33,9 @@ PAYLOAD="
 
 echo "$PAYLOAD"
 
+SUBJECT=click
+
 curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" \
 -H 'Accept: application/vnd.schemaregistry.v1+json, application/vnd.schemaregistry+json, application/json' \
   --data "${PAYLOAD}" \
-  http://localhost:18081/subjects/click/versions
+  "http://localhost:18081/subjects/${SUBJECT}/versions"

@@ -24,7 +24,9 @@ services:
             KAFKA_BROKER_ID: 2
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
         depends_on:
-            -   zookeeper
+        -   zookeeper
+        volumes:
+        -   ./data/kafka:/var/lib/kafka/data
         ports:
         -   9092:9092
 
@@ -36,7 +38,7 @@ services:
         -   2181:2181
 
     schema-registry:
-        image: confluentinc/cp-schema-registry:5.4.4
+        image: confluentinc/cp-schema-registry:5.5.4
         environment:
             SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:19092
             SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8081"
