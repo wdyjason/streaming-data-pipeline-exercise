@@ -13,6 +13,7 @@ docker-compose exec kafka bash
 ```bash
 kafka-topics --create --topic quickstart-events --bootstrap-server localhost:9092
 kafka-topics --describe --topic quickstart-events --bootstrap-server localhost:9092
+kafka-topics --list --bootstrap-server localhost:9092
 
 # Without explicit key
 kafka-console-producer --topic quickstart-events --broker-list localhost:9092
