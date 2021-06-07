@@ -1,5 +1,8 @@
 package streamingdatapipelineexercise.examples.click.v2;
 
+import org.apache.flink.api.common.functions.ReduceFunction;
+import org.apache.flink.streaming.api.functions.ProcessFunction;
+import org.apache.flink.util.Collector;
 import streamingdatapipelineexercise.examples.click.shared.Click;
 import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
 import org.apache.flink.connector.jdbc.JdbcExecutionOptions;
@@ -9,6 +12,8 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import streamingdatapipelineexercise.examples.click.shared.Config;
+import streamingdatapipelineexercise.examples.click.shared.KeyedClickDeserializationSchema;
+import streamingdatapipelineexercise.examples.click.shared.RawClick;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -45,7 +50,19 @@ public class KeyedClickWithStreamSink {
         var stream = env
                 .addSource(new FlinkKafkaConsumer<>(kafkaTopic, schema, properties));
 
-        SingleOutputStreamOperator<Click> sum = new KeyedClickTransformer(stream).perform();
+        SingleOutputStreamOperator<Click> sum = stream
+                .process(new ProcessFunction<RawClick, Click>() {
+                    @Override
+                    public void processElement(RawClick raw, Context ctx, Collector<Click> out) {
+                        Click record = new Click(raw.getItemId(), raw.getCount(), ctx.timerService().currentProcessingTime());
+                        out.collect(record);
+                    }
+                })
+                .keyBy(Click::getItemId)
+                .reduce((ReduceFunction<Click>) (value1, value2) -> new Click(
+                        value1.getItemId(), value1.getCount() + value2.getCount(), value2.getTimestamp()
+                        )
+                );
 
         sum.print();
 

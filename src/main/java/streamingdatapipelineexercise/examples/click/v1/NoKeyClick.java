@@ -8,6 +8,7 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 
+import java.math.BigInteger;
 import java.util.Properties;
 
 
@@ -33,9 +34,16 @@ public class NoKeyClick {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStream<String> stream = env
                 .addSource(new FlinkKafkaConsumer<>("no_key_click", new SimpleStringSchema(), properties));
-        SingleOutputStreamOperator<RawClick> sum = new NoKeyClickTransformer(stream).perform();
 
-        sum.print();
+        SingleOutputStreamOperator<RawClick> operator = stream.map(value -> {
+            var split = value.split(":");
+            var itemId = split[0];
+            var count = new BigInteger(split[1]);
+            return new RawClick(itemId, count.longValue());
+        })
+                .keyBy(RawClick::getItemId)
+                .sum("count");
+        operator.print();
 
         env.execute(("NoKeyClick processing"));
     }

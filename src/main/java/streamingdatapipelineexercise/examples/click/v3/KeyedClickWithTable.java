@@ -1,5 +1,8 @@
 package streamingdatapipelineexercise.examples.click.v3;
 
+import org.apache.flink.api.common.functions.ReduceFunction;
+import org.apache.flink.streaming.api.functions.ProcessFunction;
+import org.apache.flink.util.Collector;
 import streamingdatapipelineexercise.examples.click.shared.ClickRecord;
 import streamingdatapipelineexercise.examples.click.shared.Config;
 import streamingdatapipelineexercise.examples.click.shared.KeyedClickDeserializationSchema;
@@ -8,7 +11,10 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+import streamingdatapipelineexercise.examples.click.shared.RawClick;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Properties;
 
 
@@ -45,7 +51,22 @@ public class KeyedClickWithTable {
         var stream = env
                 .addSource(new FlinkKafkaConsumer<>(kafkaTopic, schema, properties));
 
-        SingleOutputStreamOperator<ClickRecord> sum = new KeyedClickByTableTransformer(stream).perform();
+        SingleOutputStreamOperator<ClickRecord> sum = stream
+                .process(new ProcessFunction<RawClick, ClickRecord>() {
+                    @Override
+                    public void processElement(RawClick raw, Context ctx, Collector<ClickRecord> out) {
+                        var epochMilli = ctx.timerService().currentProcessingTime();
+                        Timestamp timestamp = Timestamp.from(Instant.ofEpochMilli(epochMilli));
+                        ClickRecord record = new ClickRecord(raw.getItemId(), raw.getCount(), timestamp);
+                        out.collect(record);
+                    }
+                })
+                .keyBy(ClickRecord::getItemId)
+                .reduce((ReduceFunction<ClickRecord>) (value1, value2) ->
+                        new ClickRecord(value1.getItemId(),
+                                value1.getCount() + value2.getCount(),
+                                value2.getTimestamp())
+                );
 
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
         Table table = tableEnv.fromDataStream(sum);
