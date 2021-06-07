@@ -1,23 +1,39 @@
+# Schema Registry
+
+Create topic in Kakfa
 
 ```bash
+kafka-topics --create --topic click_avro --bootstrap-server localhost:9092
+```
 
-SCHEMA='
-{
-    "type": "record",
-    "name": "myrecord",
-    "fields": [
-        {
-            "name": "count",
-            "type": "long"
-        },
-        {
-            "timestamp": "count",
-            "type": "timestamp-millis"
-        }
-    ]
-}
-'
-curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" \
-  --data "${SCHEMA}" \
-  http://localhost:18081/subjects/click/versions
+Find the schema Id
+
+```
+SUBJECT=click_avro
+VERSION=1
+curl -s http://localhost:18081/subjects/${SUBJECT}-value/versions/${VERSION} | jq '.id'
+```
+
+Publish messages
+
+```bash
+kafka-avro-console-producer \
+  --broker-list kafka:19092 \
+  --topic click_avro \
+  --property schema.registry.url=http://localhost:8081 \
+  --property value.schema.id=3
+  
+# with message like
+
+{"itemId": "x", "count": 1, "eventTime": 121232432}
+```
+
+Consumer messages
+
+```bash
+kafka-avro-console-consumer   \
+  --bootstrap-server kafka:19092 \
+  --topic click_avro \
+  --property schema.registry.url=http://localhost:8081 \
+  --from-beginning
 ```
