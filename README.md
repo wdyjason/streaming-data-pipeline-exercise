@@ -47,7 +47,7 @@ Kafka中已经包含了创建的商品点击量的数据，现计算每个商品
 
 **任务1**
 
-给定schema，在Flink应用中打印反序列化后的数据。
+给定schema，通过`kafka-avro-console-producer`写入数据到Kafka，在Flink应用中打印反序列化后的数据。
 
 Schema 如下
 
@@ -76,6 +76,10 @@ Schema 如下
 **任务2**
 
 原始数据中新增了字段 userId（类型为long），迁移schema到新的版本，思考对任务1的影响。
+
+**任务3**
+
+使用Gradle任务，根据Avro的schema文件，生成相应的类型定义。
 
 ### 第3部分：使用 EventTime 和 Watermark
 
