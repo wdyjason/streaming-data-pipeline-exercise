@@ -23,6 +23,9 @@ services:
             KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
             KAFKA_BROKER_ID: 2
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        healthcheck:
+            test: ["CMD", "bash", "-c", "nc -zv kafka 19092"]
+            interval: 10s
         depends_on:
         -   zookeeper
         volumes:
@@ -50,33 +53,33 @@ services:
             -   18081:8081
 #    https://docs.confluent.io/platform/current/installation/configuration/connect/index.html
     kafka-connect:
-        image: confluentinc/cp-kafka-connect-base:5.5.4
+        build:
+            context: ./kafka-connect
         depends_on:
             -   zookeeper
             -   schema-registry
             -   kafka
         ports:
         -   8083:8083
-        healthcheck:
-            test: ["CMD", "bash", "-c", "kafka-topics --list --bootstrap-server localhost:9092"]
-            interval: 10s
         environment:
 #            https://github.com/confluentinc/kafka-images/blob/703e800d87acaf060b6eadd8c8bcf06470898579/kafka-connect-base/include/etc/confluent/docker/kafka-connect.properties.template
             CONNECT_BOOTSTRAP_SERVERS: kafka:19092
             CONNECT_GROUP_ID: kafka-connect-01
-            CONNECT_CONFIG_STORAGE_TOPIC: kafka-connect-config
-            CONNECT_OFFSET_STORAGE_TOPIC: kafka-connect-offset
-            CONNECT_STATUS_STORAGE_TOPIC: kafka-connect-status
+            CONNECT_CONFIG_STORAGE_TOPIC: _kafka-connect-config
+            CONNECT_OFFSET_STORAGE_TOPIC: _kafka-connect-offset
+            CONNECT_STATUS_STORAGE_TOPIC: _kafka-connect-status
             CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
             CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
             CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
-            CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:18081
+            CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
             CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1  # default is 3
             CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1  # default is 3
             CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1  # default is 3
-        volumes:
-        -   ./data:/kafka-connect
+            CONNECT_PLUGIN_PATH: /usr/share/java/,/usr/share/confluent-hub-components/,/usr/local/share/kafka/plugins
 
+        volumes:
+        -   ./data/kafka-connect:/data
+        -   ./kafka-connect/plugins:/usr/local/share/kafka/plugins
     database:
         image: postgres:13
         environment:

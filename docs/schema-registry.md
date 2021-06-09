@@ -33,7 +33,14 @@ Consumer messages
 ```bash
 kafka-avro-console-consumer   \
   --bootstrap-server kafka:19092 \
-  --topic click_avro \
+  --topic click_1 \
+  --property schema.registry.url=http://localhost:8081 \
+  --property print.key=true \
+  --from-beginning
+  
+kafka-avro-console-consumer   \
+  --bootstrap-server kafka:19092 \
+  --topic click_1 \
   --property schema.registry.url=http://localhost:8081 \
   --from-beginning
 ```
