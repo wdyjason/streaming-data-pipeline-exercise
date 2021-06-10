@@ -12,8 +12,8 @@ import org.apache.flink.util.Collector;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-public class KeyedClickByTableTransformer {
-    public KeyedClickByTableTransformer(DataStreamSource<RawClick> stream) {
+public class KeyedClickTransformer {
+    public KeyedClickTransformer(DataStreamSource<RawClick> stream) {
         this.stream = stream;
     }
 

@@ -1,13 +1,11 @@
 package streamingdatapipelineexercise.examples.click.v6;
 
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.util.Utf8;
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.formats.avro.registry.confluent.*;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
-import streamingdatapipelineexercise.examples.click.shared.*;
+import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+import streamingdatapipelineexercise.examples.click.shared.Click;
+import streamingdatapipelineexercise.examples.click.shared.Config;
+import streamingdatapipelineexercise.examples.click.shared.StreamBuilder;
 
 import java.util.Properties;
 
@@ -27,43 +25,7 @@ public class AvroClick {
 
         var env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        var expectedContent = "{\n" +
-                "      \"type\": \"record\",\n" +
-                "      \"name\": \"click\",\n" +
-                "      \"fields\": [\n" +
-                "          {\n" +
-                "              \"name\": \"itemId\",\n" +
-                "              \"type\": \"string\"\n" +
-                "          },\n" +
-                "          {\n" +
-                "              \"name\": \"count\",\n" +
-                "              \"type\": \"long\"\n" +
-                "          },\n" +
-                "          {\n" +
-                "              \"name\": \"eventTime\",\n" +
-                "              \"type\" : \"long\",\n" +
-                "              \"logicalType\": \"timestamp-millis\"\n" +
-                "          }\n" +
-                "      ]\n" +
-                "    }";
-        Schema expectedSchema = new Schema.Parser().parse(expectedContent);
-
-        var schema = ConfluentRegistryAvroDeserializationSchema.forGeneric(
-                expectedSchema,
-                Config.SCHEMA_REGISTRY_SERVER
-        );
-
-        var stream = env
-                .addSource(new FlinkKafkaConsumer<>(kafkaTopic, schema, properties));
-
-        stream.map((MapFunction<GenericRecord, Click>) value -> {
-            Utf8 itemId = (Utf8) value.get("itemId");
-            long count = (long) value.get("count");
-            long eventTime = (long) value.get("eventTime");
-            return new Click(
-                    itemId.toString(), count, eventTime
-            );
-        }).print();
+        SingleOutputStreamOperator<Click> map = StreamBuilder.getClickStreamOperator(properties, kafkaTopic, env);
 
         env.execute("AvroClick");
     }

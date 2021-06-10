@@ -1,12 +1,15 @@
 package streamingdatapipelineexercise.examples.click.v4;
 
+import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows;
+import org.apache.flink.streaming.api.windowing.time.Time;
 import streamingdatapipelineexercise.examples.click.shared.Config;
-import streamingdatapipelineexercise.examples.click.shared.KeyedClickByTableTransformer;
+import streamingdatapipelineexercise.examples.click.shared.KeyedClickTransformer;
 import streamingdatapipelineexercise.examples.click.shared.KeyedClickDeserializationSchema;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+import streamingdatapipelineexercise.examples.click.shared.RawClick;
 
 import java.util.Properties;
 
@@ -47,7 +50,12 @@ public class KeyedClickCurrentTop3WithTable {
         var stream = env
                 .addSource(new FlinkKafkaConsumer<>(kafkaTopic, schema, properties));
 
-        var windowedClickStream = new KeyedClickByTableTransformer(stream).perform();
+        var windowedClickStream = new KeyedClickTransformer(stream).perform();
+
+        stream
+                .keyBy(RawClick::getItemId)
+                .window(SlidingProcessingTimeWindows.of(Time.seconds(10), Time.seconds(5)))
+                .reduce(new KeyedClickTransformer.MyReduceFunction(), new KeyedClickTransformer.MyProcessWindowFunction());
 
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
         var top = 3;

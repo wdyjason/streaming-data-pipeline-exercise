@@ -21,11 +21,11 @@ kafka-avro-console-producer \
   --broker-list kafka:19092 \
   --topic click_avro \
   --property schema.registry.url=http://localhost:8081 \
-  --property value.schema.id=3
+  --property value.schema.id=4
   
 # with message like
 
-{"itemId": "x", "count": 1, "eventTime": 121232432}
+{"itemId": "item123", "count": 1, "eventTime": 1623259315000}
 ```
 
 Consumer messages
@@ -33,7 +33,7 @@ Consumer messages
 ```bash
 kafka-avro-console-consumer   \
   --bootstrap-server kafka:19092 \
-  --topic click_1 \
+  --topic item_v1 \
   --property schema.registry.url=http://localhost:8081 \
   --property print.key=true \
   --from-beginning

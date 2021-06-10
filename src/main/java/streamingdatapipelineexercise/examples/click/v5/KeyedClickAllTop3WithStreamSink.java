@@ -1,7 +1,7 @@
 package streamingdatapipelineexercise.examples.click.v5;
 
 import streamingdatapipelineexercise.examples.click.shared.Config;
-import streamingdatapipelineexercise.examples.click.shared.KeyedClickByTableTransformer;
+import streamingdatapipelineexercise.examples.click.shared.KeyedClickTransformer;
 import streamingdatapipelineexercise.examples.click.shared.KeyedClickDeserializationSchema;
 import streamingdatapipelineexercise.examples.click.shared.WindowClickRecord;
 import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
@@ -49,7 +49,7 @@ public class KeyedClickAllTop3WithStreamSink {
         var stream = env
                 .addSource(new FlinkKafkaConsumer<>(kafkaTopic, schema, properties));
 
-        var windowedClickStream = new KeyedClickByTableTransformer(stream).perform();
+        var windowedClickStream = new KeyedClickTransformer(stream).perform();
 
         windowedClickStream.addSink(buildDatabaseSink(
                 "jdbc:postgresql://localhost:5432/database",
