@@ -2,7 +2,7 @@ version: '3'
 services: 
     # https://ci.apache.org/projects/flink/flink-docs-master/docs/deployment/resource-providers/standalone/docker/
     jobmanager:
-        image: flink:scala_2.12-java11
+        image: flink:1.13.0-scala_2.12-java11
         ports: 
             - 8081:8081
         environment: 
@@ -10,7 +10,7 @@ services:
         command: jobmanager
 
     taskmanager:
-        image: flink:scala_2.12-java11
+        image: flink:1.13.0-scala_2.12-java11
         environment: 
             FLINK_PROPERTIES: "jobmanager.rpc.address: jobmanager"
         command: taskmanager
@@ -24,12 +24,12 @@ services:
             KAFKA_BROKER_ID: 2
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
         healthcheck:
-            test: ["CMD", "bash", "-c", "nc -zv kafka 19092"]
+            test: ["CMD", "bash", "-c", "nc -zv localhost 19092"]
             interval: 10s
         depends_on:
         -   zookeeper
-        volumes:
-        -   ./data/kafka:/var/lib/kafka/data
+#        volumes:
+#        -   ./data/kafka:/var/lib/kafka/data
         ports:
         -   9092:9092
 
@@ -82,7 +82,6 @@ services:
         -   ./data/kafka-connect:/data
         -   ./kafka-connect/plugins:/usr/local/share/kafka/plugins
     database:
-
         image: postgres:13
         environment:
             POSTGRES_USER: postgres

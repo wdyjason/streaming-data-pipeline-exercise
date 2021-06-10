@@ -78,10 +78,10 @@ public class KeyedClickCurrentTop3WithTable {
                 "  endTime TIMESTAMP\n" +
                 ")";
 
-        String jdbcURL = "jdbc:postgresql://localhost:5432/database";
+        String jdbcURL = Config.JDBC_URL;
+        String username = Config.JDBC_USERNAME;
+        String password = Config.JDBC_PASSWORD;
         String dbTableName = "keyed_click_v4";
-        String username = "postgres";
-        String password = "'postgres'";
 
         String statement = createTableStatement +
                 " WITH (\n" +
@@ -89,7 +89,7 @@ public class KeyedClickCurrentTop3WithTable {
                 "   'url' = '" + jdbcURL + "',\n" +
                 "   'table-name' = '" + dbTableName + "',\n" +
                 "   'username' = '" + username + "',\n" +
-                "   'password' = " + password + "\n" +
+                "   'password' = '" + password + "'\n" +
                 ")";
         tableEnv.executeSql(statement);
 

@@ -71,9 +71,9 @@ public class KeyedClickWithStreamSink {
         sum.print();
 
         sum.addSink(buildDatabaseSink(
-                "jdbc:postgresql://localhost:5432/database",
-                "postgres",
-                "postgres"));
+                Config.JDBC_URL,
+                Config.JDBC_USERNAME,
+                Config.JDBC_PASSWORD));
 
         env.execute(("KeyedClick processing"));
     }

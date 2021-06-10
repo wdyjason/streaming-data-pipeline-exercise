@@ -85,9 +85,9 @@ public class KeyedClickAllTop3WithStreamSink {
         var windowedClickStream = new KeyedClickTransformer(stream).perform();
 
         windowedClickStream.addSink(buildDatabaseSink(
-                "jdbc:postgresql://localhost:5432/database",
-                "postgres",
-                "postgres", "keyed_click_v5"));
+                Config.JDBC_URL,
+                Config.JDBC_USERNAME,
+                Config.JDBC_PASSWORD, "keyed_click_v5"));
 
         env.execute("Click v3 processing");
     }

@@ -23,6 +23,13 @@ import static org.apache.flink.table.api.Expressions.$;
 
 /**
  *
+ * CREATE TABLE click_v7 (
+ *      itemId VARCHAR PRIMARY KEY,
+ *      description VARCHAR,
+ *      "count" BIGINT,
+ *      startTime timestamp,
+ *      endTime timestamp
+ * )
  */
 
 public class MultipleTopics {
@@ -124,10 +131,10 @@ public class MultipleTopics {
                 "  description VARCHAR\n" +
                 ")";
 
-        String jdbcURL = "jdbc:postgresql://localhost:5432/database";
+        String jdbcURL = Config.JDBC_URL;
+        String username = Config.JDBC_USERNAME;
+        String password = Config.JDBC_PASSWORD;
         String dbTableName = "click_v7";
-        String username = "postgres";
-        String password = "'postgres'";
 
         String statement = createTableStatement +
                 " WITH (\n" +
@@ -135,12 +142,11 @@ public class MultipleTopics {
                 "   'url' = '" + jdbcURL + "',\n" +
                 "   'table-name' = '" + dbTableName + "',\n" +
                 "   'username' = '" + username + "',\n" +
-                "   'password' = " + password + "\n" +
+                "   'password' = '" + password + "'\n" +
                 ")";
+
         tableEnv.executeSql(statement);
 
         joinedTable.executeInsert(tablePath);
-
-        env.execute("MultipleTopics");
     }
 }

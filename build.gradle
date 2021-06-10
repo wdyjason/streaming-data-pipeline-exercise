@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'application'
     // shadow plugin to produce fat JARs
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
 
 group 'org.example'
@@ -27,28 +27,29 @@ repositories {
 applicationDefaultJvmArgs = ["-Dlog4j.configurationFile=log4j2.properties"]
 
 dependencies {
-    compile "org.apache.flink:flink-streaming-java_${scalaBinaryVersion}:${flinkVersion}"
-    compile "org.apache.flink:flink-clients_${scalaBinaryVersion}:${flinkVersion}"
+    implementation "org.apache.flink:flink-streaming-java_${scalaBinaryVersion}:${flinkVersion}"
+    implementation "org.apache.flink:flink-clients_${scalaBinaryVersion}:${flinkVersion}"
 
     // for Kafka connector
-    compile "org.apache.flink:flink-connector-kafka_${scalaBinaryVersion}:${flinkVersion}"
+    implementation "org.apache.flink:flink-connector-kafka_${scalaBinaryVersion}:${flinkVersion}"
 
     // for jdbc
-    compile "org.apache.flink:flink-connector-jdbc_${scalaBinaryVersion}:${flinkVersion}"
-    compile "org.postgresql:postgresql:${postgresJDBCVersion}"
+    implementation "org.apache.flink:flink-connector-jdbc_${scalaBinaryVersion}:${flinkVersion}"
+    implementation "org.postgresql:postgresql:${postgresJDBCVersion}"
 
     //  for avro confluent schema registry
-    compile "org.apache.flink:flink-avro-confluent-registry:${flinkVersion}"
+    implementation "org.apache.flink:flink-avro-confluent-registry:${flinkVersion}"
 
     // for table api
-    compile "org.apache.flink:flink-table-api-java-bridge_${scalaBinaryVersion}:${flinkVersion}"
-    compile "org.apache.flink:flink-table-planner-blink_${scalaBinaryVersion}:${flinkVersion}"
-    compile "org.apache.flink:flink-streaming-scala_${scalaBinaryVersion}:${flinkVersion}"
+    implementation "org.apache.flink:flink-table-api-java-bridge_${scalaBinaryVersion}:${flinkVersion}"
+    implementation "org.apache.flink:flink-table-planner_${scalaBinaryVersion}:${flinkVersion}"
+    implementation "org.apache.flink:flink-table-planner-blink_${scalaBinaryVersion}:${flinkVersion}"
+    implementation "org.apache.flink:flink-streaming-scala_${scalaBinaryVersion}:${flinkVersion}"
 
-    compile "org.apache.logging.log4j:log4j-api:${log4jVersion}"
-    compile "org.apache.logging.log4j:log4j-core:${log4jVersion}"
-    compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
-    compile "org.slf4j:slf4j-log4j12:${slf4jVersion}"
+    implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+    implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+    implementation "org.slf4j:slf4j-log4j12:${slf4jVersion}"
 
     testImplementation "org.apache.flink:flink-test-utils_${scalaBinaryVersion}:${flinkVersion}"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
@@ -68,13 +69,20 @@ shadowJar {
     configurations = [project.configurations.compileClasspath]
 
     dependencies {
-        exclude(dependency("org.apache.flink:flink-streaming-java_*"))
-        exclude(dependency("org.apache.flink:flink-clients_*"))
-        exclude(dependency("org.apache.flink:flink-table-*"))
-        exclude(dependency("org.apache.flink:flink-streaming-scala_*"))
+        exclude(dependency("org.apache.flink:flink-streaming-java_.*"))
+        exclude(dependency("org.apache.flink:flink-clients_.*"))
+        exclude(dependency("org.apache.flink:flink-table-api-java-bridge_.*"))
+        exclude(dependency("org.apache.flink:flink-table-planner-blink_.*"))
+        exclude(dependency("org.apache.flink:flink-table-planner_.*"))
+        exclude(dependency("org.apache.flink:flink-streaming-scala_.*"))
+
         exclude(dependency("org.slf4j:.*"))
         exclude(dependency("org.apache.logging.log4j:.*"))
     }
+
+//    https://ci.apache.org/projects/flink/flink-docs-release-1.13/docs/connectors/table/overview/#transform-table-connectorformat-resources
+//    Merge META-INF/services
+    mergeServiceFiles()
 }
 
 test {
