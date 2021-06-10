@@ -2,11 +2,9 @@ package streamingdatapipelineexercise.examples.click.v7;
 
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.ReduceFunction;
-import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
-import org.apache.flink.streaming.api.functions.windowing.RichWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
@@ -29,6 +27,10 @@ import static org.apache.flink.table.api.Expressions.$;
 
 public class MultipleTopics {
     public static void main(String[] args) throws Exception {
+        new MultipleTopics().execute();
+    }
+
+    public void execute() throws Exception {
         Properties properties = new Properties();
         String kafkaBoostrapServers = Config.KAFKA_BOOTSTRAP_SERVERS;
         properties.setProperty("bootstrap.servers", kafkaBoostrapServers);

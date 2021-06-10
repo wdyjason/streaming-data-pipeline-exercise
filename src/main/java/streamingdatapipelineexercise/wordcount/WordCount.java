@@ -8,6 +8,10 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 public class WordCount {
 //  Run `nc -lk 9999` from terminal before running main method.
     public static void main(String[] args) throws Exception {
+        new WordCount().execute();
+    }
+
+    private void execute() throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<String> dataStreamSource = env
                 .socketTextStream("localhost", 9999);
@@ -15,5 +19,4 @@ public class WordCount {
         dataStream.print();
         env.execute("WordCount");
     }
-
 }

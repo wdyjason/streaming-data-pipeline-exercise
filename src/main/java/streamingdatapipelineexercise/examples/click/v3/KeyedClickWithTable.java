@@ -39,6 +39,10 @@ import java.util.Properties;
 
 public class KeyedClickWithTable {
     public static void main(String[] args) throws Exception {
+        new KeyedClickWithTable().execute();
+    }
+
+    public void execute() throws Exception {
         Properties properties = new Properties();
         String kafkaBoostrapServers = Config.KAFKA_BOOTSTRAP_SERVERS;
         properties.setProperty("bootstrap.servers", kafkaBoostrapServers);

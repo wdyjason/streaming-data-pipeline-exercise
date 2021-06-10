@@ -37,26 +37,7 @@ import java.util.Properties;
 
 public class KeyedClickAllTop3WithStreamSink {
     public static void main(String[] args) throws Exception {
-        Properties properties = new Properties();
-        String kafkaBoostrapServers = Config.KAFKA_BOOTSTRAP_SERVERS;
-        properties.setProperty("bootstrap.servers", kafkaBoostrapServers);
-        String groupId = "KeyedClickTop3";
-        properties.setProperty("group.id", groupId);
-        String kafkaTopic = "keyed_click";
-
-        var env = StreamExecutionEnvironment.getExecutionEnvironment();
-        var schema = new KeyedClickDeserializationSchema();
-        var stream = env
-                .addSource(new FlinkKafkaConsumer<>(kafkaTopic, schema, properties));
-
-        var windowedClickStream = new KeyedClickTransformer(stream).perform();
-
-        windowedClickStream.addSink(buildDatabaseSink(
-                "jdbc:postgresql://localhost:5432/database",
-                "postgres",
-                "postgres", "keyed_click_v5"));
-
-        env.execute("Click v3 processing");
+        new KeyedClickAllTop3WithStreamSink().execute();
     }
 
     private static SinkFunction<WindowClickRecord> buildDatabaseSink(String jdbcURL, String username, String password, String tableName) {
@@ -88,4 +69,26 @@ public class KeyedClickAllTop3WithStreamSink {
         );
     }
 
+    private void execute() throws Exception {
+        Properties properties = new Properties();
+        String kafkaBoostrapServers = Config.KAFKA_BOOTSTRAP_SERVERS;
+        properties.setProperty("bootstrap.servers", kafkaBoostrapServers);
+        String groupId = "KeyedClickTop3";
+        properties.setProperty("group.id", groupId);
+        String kafkaTopic = "keyed_click";
+
+        var env = StreamExecutionEnvironment.getExecutionEnvironment();
+        var schema = new KeyedClickDeserializationSchema();
+        var stream = env
+                .addSource(new FlinkKafkaConsumer<>(kafkaTopic, schema, properties));
+
+        var windowedClickStream = new KeyedClickTransformer(stream).perform();
+
+        windowedClickStream.addSink(buildDatabaseSink(
+                "jdbc:postgresql://localhost:5432/database",
+                "postgres",
+                "postgres", "keyed_click_v5"));
+
+        env.execute("Click v3 processing");
+    }
 }

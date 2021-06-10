@@ -41,6 +41,10 @@ import java.util.Properties;
 
 public class KeyedClickWithStreamSink {
     public static void main(String[] args) throws Exception {
+        new KeyedClickWithStreamSink().execute();
+    }
+
+    public void execute() throws Exception {
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", Config.KAFKA_BOOTSTRAP_SERVERS);
         properties.setProperty("group.id", "KeyedClick");
@@ -60,7 +64,7 @@ public class KeyedClickWithStreamSink {
                 })
                 .keyBy(Click::getItemId)
                 .reduce((ReduceFunction<Click>) (value1, value2) -> new Click(
-                        value1.getItemId(), value1.getCount() + value2.getCount(), value2.getTimestamp()
+                                value1.getItemId(), value1.getCount() + value2.getCount(), value2.getTimestamp()
                         )
                 );
 
@@ -74,7 +78,7 @@ public class KeyedClickWithStreamSink {
         env.execute(("KeyedClick processing"));
     }
 
-    private static SinkFunction<Click> buildDatabaseSink(String jdbcURL, String username, String password) {
+    private SinkFunction<Click> buildDatabaseSink(String jdbcURL, String username, String password) {
         String dbTableName = "keyed_click";
         return JdbcSink.sink(
                 "INSERT INTO " + dbTableName + " (itemId, \"count\", \"timestamp\") values (?, ?, ?)\n" +
@@ -102,5 +106,4 @@ public class KeyedClickWithStreamSink {
                         .build()
         );
     }
-
 }

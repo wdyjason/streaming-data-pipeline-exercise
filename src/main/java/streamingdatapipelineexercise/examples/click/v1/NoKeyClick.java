@@ -28,6 +28,10 @@ import java.util.Properties;
 
 public class NoKeyClick {
     public static void main(String[] args) throws Exception {
+        new NoKeyClick().execute();
+    }
+
+    public void execute() throws Exception {
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", Config.KAFKA_BOOTSTRAP_SERVERS);
         properties.setProperty("group.id", "NoKeyClick");
@@ -47,5 +51,4 @@ public class NoKeyClick {
 
         env.execute(("NoKeyClick processing"));
     }
-
 }

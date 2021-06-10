@@ -38,6 +38,10 @@ import static org.apache.flink.table.api.Expressions.$;
 
 public class KeyedClickCurrentTop3WithTable {
     public static void main(String[] args) throws Exception {
+        new KeyedClickCurrentTop3WithTable().execute();
+    }
+
+    public void execute() throws Exception {
         Properties properties = new Properties();
         String kafkaBoostrapServers = Config.KAFKA_BOOTSTRAP_SERVERS;
         properties.setProperty("bootstrap.servers", kafkaBoostrapServers);
