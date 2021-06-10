@@ -10,7 +10,7 @@ version '1.0-SNAPSHOT'
 mainClassName = 'streamingdatapipelineexercise.Launcher'
 
 ext {
-    flinkVersion = '1.13.1'
+    flinkVersion = '1.13.0'
     scalaBinaryVersion = '2.12'
     slf4jVersion = '1.7.15'
     log4jVersion = '2.12.1'
@@ -70,11 +70,11 @@ shadowJar {
 
     dependencies {
         exclude(dependency("org.apache.flink:flink-streaming-java_.*"))
-        exclude(dependency("org.apache.flink:flink-clients_.*"))
-        exclude(dependency("org.apache.flink:flink-table-api-java-bridge_.*"))
-        exclude(dependency("org.apache.flink:flink-table-planner-blink_.*"))
-        exclude(dependency("org.apache.flink:flink-table-planner_.*"))
         exclude(dependency("org.apache.flink:flink-streaming-scala_.*"))
+        exclude(dependency("org.apache.flink:flink-clients_.*"))
+        exclude(dependency("org.apache.flink:flink-table-.*"))
+
+        exclude(dependency("org.codehaus.janino:.*"))
 
         exclude(dependency("org.slf4j:.*"))
         exclude(dependency("org.apache.logging.log4j:.*"))
