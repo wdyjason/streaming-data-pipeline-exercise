@@ -77,10 +77,21 @@ Schema 如下
 
 原始数据中新增了字段 userId（类型为long），迁移schema到新的版本，思考对任务1的影响。
 
-**任务3**
-
-使用Gradle任务，根据Avro的schema文件，生成相应的类型定义。
-
 ### 第3部分：使用 EventTime 和 Watermark
 
-TODO
+
+### 第4部分：使用 Kafka Connect 接入数据
+
+给定全量的商品主数据，使用 Kafka Connect 和 CSV connect 导入到 Kafka之中。
+
+### 第5部分：完整练习
+
+根据商品信息和商品点击事件，计算实时点击量TOP N的商品。
+
+输入：
+* ClickEvent：通过Kafka客户端写入Kakfa，是实时的流数据，数据可能会迟到。包含itemId, userId, timestamp。本次练习可使用 avro-kafka-consumer-console 写入。
+* ItemData: 商品主数据。定期的更新CSV文件（全量数据）。包含 itemId, description。
+
+输出：itemId, description, count, startTime, endTime
+
+其他：Kafka中的数据使用avro编码，通过schema registry进行校验；当程序重启时，能从上次断点继续执行（容错）
