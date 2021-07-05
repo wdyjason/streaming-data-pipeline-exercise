@@ -18,7 +18,7 @@ asdf 举例：
 * 安装 Java 插件 `asdf plugin add java`
 * 查看可用的 Java 版本 `asdf list all java`
 * 安装特定版本的 Python，比如 `asdf install python adoptopenjdk-11.0.11+9`
-* 启用该版本 `asdf global python adoptopenjdk-11.0.11+9`
+* 启用该版本 `asdf global java adoptopenjdk-11.0.11+9`
 
 ## IntelliJ Idea
 
@@ -52,4 +52,12 @@ brew install docker
 git clone https://github.com/data-community/streaming-data-pipeline-exercise
 cd streaming-data-pipeline-exercise
 docker-compose pull
+```
+
+## 安装依赖包
+
+在项目目录执行
+
+```
+./gradlew clean build
 ```
