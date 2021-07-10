@@ -53,8 +53,6 @@ services:
             -   18081:8081
 #    https://docs.confluent.io/platform/current/installation/configuration/connect/index.html
     kafka-connect:
-        build:
-            context: ./kafka-connect
         depends_on:
             -   zookeeper
             -   schema-registry
