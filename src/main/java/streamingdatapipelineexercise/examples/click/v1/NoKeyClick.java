@@ -35,9 +35,12 @@ public class NoKeyClick {
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", Config.KAFKA_BOOTSTRAP_SERVERS);
         properties.setProperty("group.id", "NoKeyClick");
+
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+
         DataStream<String> stream = env
                 .addSource(new FlinkKafkaConsumer<>("no_key_click", new SimpleStringSchema(), properties));
+
 
         SingleOutputStreamOperator<RawClick> operator = stream.map(value -> {
             var split = value.split(":");

@@ -1,6 +1,7 @@
 package streamingdatapipelineexercise.examples.click.v2;
 
 import org.apache.flink.api.common.functions.ReduceFunction;
+import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.util.Collector;
 import streamingdatapipelineexercise.examples.click.shared.Click;
@@ -48,13 +49,15 @@ public class KeyedClickWithStreamSink {
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", Config.KAFKA_BOOTSTRAP_SERVERS);
         properties.setProperty("group.id", "KeyedClick");
+
         var env = StreamExecutionEnvironment.getExecutionEnvironment();
         var schema = new KeyedClickDeserializationSchema();
         String kafkaTopic = "keyed_click";
-        var stream = env
+
+        DataStreamSource<RawClick> stream = env
                 .addSource(new FlinkKafkaConsumer<>(kafkaTopic, schema, properties));
 
-        SingleOutputStreamOperator<Click> sum = stream
+        SingleOutputStreamOperator<Click> streamOperator = stream
                 .process(new ProcessFunction<RawClick, Click>() {
                     @Override
                     public void processElement(RawClick raw, Context ctx, Collector<Click> out) {
@@ -68,9 +71,9 @@ public class KeyedClickWithStreamSink {
                         )
                 );
 
-        sum.print();
+        streamOperator.print();
 
-        sum.addSink(buildDatabaseSink(
+        streamOperator.addSink(buildDatabaseSink(
                 Config.JDBC_URL,
                 Config.JDBC_USERNAME,
                 Config.JDBC_PASSWORD));

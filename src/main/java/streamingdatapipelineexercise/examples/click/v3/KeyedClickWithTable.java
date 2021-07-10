@@ -97,8 +97,6 @@ public class KeyedClickWithTable {
                 "   'password' = '" + password + "'\n" +
                 ")";
         tableEnv.executeSql(statement);
-
-        table.executeInsert(tablePath);
         env.execute(("Click v3 processing"));
     }
 }
