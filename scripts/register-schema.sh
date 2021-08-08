@@ -4,7 +4,7 @@ set -e
 
 SCHEMA='{
       "type": "record",
-      "name": "click",
+      "name": "click_avro",
       "fields": [
           {
               "name": "itemId",
@@ -33,7 +33,7 @@ PAYLOAD="
 
 echo "$PAYLOAD"
 
-SUBJECT=click
+SUBJECT=click_avro
 
 curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" \
 -H 'Accept: application/vnd.schemaregistry.v1+json, application/vnd.schemaregistry+json, application/json' \

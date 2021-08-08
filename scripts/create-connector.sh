@@ -48,7 +48,7 @@ PAYLOAD="
         \"tasks.max\": \"1\",
         \"topic\": \"item_v1\",
         \"input.path\": \"/data/raw/item_v1/\",
-        \"input.file.pattern\": \".*csv\",
+        \"input.file.pattern\": \"c.csv\",
         \"error.path\": \"/data/error/item_v1/\",
         \"finished.path\": \"/data/finished/item_v1\",
         \"csv.first.row.as.header\": true,

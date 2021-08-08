@@ -21,7 +21,7 @@ kafka-avro-console-producer \
   --broker-list kafka:19092 \
   --topic click_avro \
   --property schema.registry.url=http://localhost:8081 \
-  --property value.schema.id=4
+  --property value.schema.id=1
   
 # with message like
 
@@ -34,13 +34,12 @@ Consumer messages
 kafka-avro-console-consumer   \
   --bootstrap-server kafka:19092 \
   --topic item_v1 \
-  --property schema.registry.url=http://localhost:8081 \
-  --property print.key=true \
-  --from-beginning
+  --from-beginning \
+  --partition 0
   
 kafka-avro-console-consumer   \
   --bootstrap-server kafka:19092 \
-  --topic click_1 \
+  --topic click_avro \
   --property schema.registry.url=http://localhost:8081 \
   --from-beginning
 ```

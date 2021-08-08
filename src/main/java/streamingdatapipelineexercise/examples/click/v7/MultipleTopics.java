@@ -50,6 +50,7 @@ public class MultipleTopics {
 
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
 
+        //topN
         SingleOutputStreamOperator<Click> eventStreamOperator = StreamBuilder.getClickStreamOperator(properties, "click_avro", env);
 
         SingleOutputStreamOperator<WindowClickRecord> clickWindowStream = eventStreamOperator
@@ -82,7 +83,7 @@ public class MultipleTopics {
                         $("endTime").desc(),
                         $("count").desc()
                 ).limit(3);
-
+        // item
         var itemStream = StreamBuilder
                 .getItemStreamOperator(properties, "item_v1", env)
                 .keyBy(Item::getItemId)
